@@ -27,7 +27,7 @@ class _AllArtsHomeScreenState extends State<AllArtsHomeScreen> {
 
   Future<void> fetchData() async {
     final url = Uri.parse(
-        'https://api.artic.edu/api/v1/artworks/search?q=${searchTerm.text}&page=$currentPage&query[term][is_public_domain]=true&fields=id,title,image_id,artist_display,thumbnail.width,thumbnail.height,date_display,artist_display,description,short_description&size=10');
+        'https://api.artic.edu/api/v1/artworks/search?q=${searchTerm.text}&page=$currentPage&query[term][is_public_domain]=true&fields=id,title,image_id,artist_display,thumbnail.width,thumbnail.height,date_display,artist_display,description,short_description&size=15');
 
     final response = await http.get(url);
 
@@ -96,6 +96,7 @@ class _AllArtsHomeScreenState extends State<AllArtsHomeScreen> {
                         setState(() {});
                       },
                       onSubmitted: (v) {
+                        currentPage = 1;
                         fetchData();
                       },
                       decoration: InputDecoration(
@@ -139,46 +140,28 @@ class _AllArtsHomeScreenState extends State<AllArtsHomeScreen> {
                             double ratioDouble = arts[artsIndex]['thumbnail']
                                     ['width'] /
                                 arts[artsIndex]['thumbnail']['height'];
-                            int ratio = ratioDouble.round();
+                            double ratio = ratioDouble;
                             debugPrint(
                                 "ratio for ${artsIndex + 1} : $ratioDouble");
-                            if (ratio == 0) {
-                              mainAxisCount = 2;
-                              crossAxisCount = 1;
-                            } else if (ratio == 1) {
+                            if (ratio >= 0 && ratio < 0.75) {
+                              //for 0.5
+                              mainAxisCount = 3;
+                              crossAxisCount = 2;
+                            } else if (ratio >= 0.75 && ratio < 1.25) {
+                              //for 1.0
                               mainAxisCount = 2;
                               crossAxisCount = 2;
-                            } else if (ratio == 2) {
+                            } else if (ratio >= 1.25 && ratio < 1.75) {
+                              //for 1.5
+                              mainAxisCount = 3;
+                              crossAxisCount = 2;
+                            } else if (ratio >= 1.75 && ratio < 1.25) {
+                              //for 2.0
                               mainAxisCount = 1;
                               crossAxisCount = 2;
                             }
                           }
 
-                          // if (artsIndex == 1) {
-                          //   crossAxisCount = 2;
-                          //   mainAxisCount = 1;
-                          // } else if (artsIndex == 2 || artsIndex == 3) {
-                          //   crossAxisCount = 1;
-                          //   mainAxisCount = 1;
-                          // } else if (artsIndex == 4) {
-                          //   crossAxisCount = 4;
-                          //   mainAxisCount = 2;
-                          // } else if (artsIndex == 5) {
-                          //   crossAxisCount = 2;
-                          //   mainAxisCount = 1;
-                          // } else if (artsIndex == 6) {
-                          //   crossAxisCount = 2;
-                          //   mainAxisCount = 1;
-                          // } else if (artsIndex == 7) {
-                          //   crossAxisCount = 2;
-                          //   mainAxisCount = 2;
-                          // } else if (artsIndex == 8) {
-                          //   crossAxisCount = 2;
-                          //   mainAxisCount = 2;
-                          // } else if (artsIndex == 9) {
-                          //   crossAxisCount = 2;
-                          //   mainAxisCount = 2;
-                          // }
                           return StaggeredGridTile.count(
                             crossAxisCellCount: crossAxisCount,
                             mainAxisCellCount: mainAxisCount,
@@ -188,7 +171,7 @@ class _AllArtsHomeScreenState extends State<AllArtsHomeScreen> {
                                 "https://www.artic.edu/iiif/2/${arts[artsIndex]['image_id']}/full/200,/0/default.jpg",
                                 width: 200,
                                 height: 200,
-                                fit: BoxFit.contain,
+                                fit: BoxFit.cover,
                               ),
                             ),
                           );
